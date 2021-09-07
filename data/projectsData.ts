@@ -1,19 +1,15 @@
 const projectsData = [
   {
-    title: 'A Search Engine',
-    description: `What if you could look up any information in the world? Webpages, images, videos
-    and more. Google has many features to help you find exactly what you're looking
-    for.`,
-    imgSrc: '/static/images/google.png',
-    href: 'https://www.google.com',
+    title: 'Personal Site (Work In Progress)',
+    description: `personal website, portfolio. Still work in progress to build more on it.`,
+    imgSrc: '/static/images/personal-site.png',
+    href: 'https://www.szuyuwang.com',
   },
   {
-    title: 'The Time Machine',
-    description: `Imagine being able to travel back in time or to the future. Simple turn the knob
-    to the desired date and press "Go". No more worrying about lost keys or
-    forgotten handphones with this simple yet affordable solution.`,
-    imgSrc: '/static/images/time-machine.jpg',
-    href: '/blog/the-time-machine',
+    title: 'Youtube Channel',
+    description: `A place where I share my life, work and tech`,
+    imgSrc: '/static/images/youtube.png',
+    href: 'https://www.youtube.com/user/TheJoeywang123',
   },
 ]
 
