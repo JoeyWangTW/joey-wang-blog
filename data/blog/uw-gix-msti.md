@@ -8,7 +8,7 @@ images: []
 layout: PostLayout
 ---
 
-[//]: TODO: add photo and links. Make it easier to read with layout adjustments
+[//]: # 'TODO: add photo and links. Make it easier to read with layout adjustments'
 
 # Intro
 
