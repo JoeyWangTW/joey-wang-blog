@@ -84,12 +84,12 @@ export default function PostLayout({ frontMatter, authorDetails, next, prev, chi
                         <dd className="text-gray-900 dark:text-gray-100">{author.name}</dd>
                         <dt className="sr-only">Twitter</dt>
                         <dd>
-                          {author.linkedin && (
+                          {author.twitter && (
                             <Link
-                              href={author.linkedin}
+                              href={author.twitter}
                               className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
                             >
-                              {author.linkedin.replace('https://www.linkedin.com/in/', '@')}
+                              {author.twitter.replace('https://twitter.com/', '@')}
                             </Link>
                           )}
                         </dd>
