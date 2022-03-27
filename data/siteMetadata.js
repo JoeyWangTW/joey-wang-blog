@@ -4,6 +4,7 @@ const siteMetadata = {
   headerTitle: "Joey's Blog",
   description: '科技新創 / Web Dev / Clojure / 美國生活',
   language: 'zh-tw',
+  theme: 'dark',
   siteUrl: 'https://joeywang.blog',
   siteRepo: 'https://github.com/JoeyWangTW/joey-wang-blog',
   siteLogo: '/static/images/logo.png',
