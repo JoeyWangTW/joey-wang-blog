@@ -8,8 +8,10 @@ linkedin: https://www.linkedin.com/in/szuyuwang
 github: https://github.com/JoeyWangTW
 ---
 
-Joey is from Taiwan. A tech enthusiast.
+Hi! I'm a tech enthusiast from Taiwan. Super interested in tech products!
 
 Working as a software engineer @ Gatheround.
 
-Continuously finding ways to make the world a better place.
+Writing ClojureScript, learning new stuff everyday!
+
+Continuously finding ways to make the world a better place, and have fun along the way.
