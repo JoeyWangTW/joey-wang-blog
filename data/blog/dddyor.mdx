@@ -1,0 +1,170 @@
+---
+title: 我的第一個 "Web3" 網站，錢包視覺化 DDDYOR
+date: '2022-04-05'
+tags: ['Web3', 'web dev', 'projects']
+draft: false
+summary: 做一個鏈上數據分析互動網站比你想像的更簡單，Etherscan, Alchemy, Ethers.js 超容易上手
+images: []
+layout: PostLayout
+---
+
+## 動機 + 導讀
+
+從 2017 年第一次聽到區塊鏈，我一直在觀望，去年底(2021)決定好好學習一下這個領域。最好的學習方法就是親自動手，剛好看到一個[twitter thread](https://twitter.com/0x_Jonas/status/1482248994332250112) 在講怎麼一些工具查地址，判斷對方一個人是不是 crypto native，於是就決定要來做一個調查地址的應用。
+
+一開始只是把他提到的幾個網站弄成像是 linktree 一樣，一鍵調查，其實只是純前端很簡單。但是後來發現很多人不止一個錢包，所以搞清楚錢包間的關係也很重要，於是開始研究怎麼拿鏈上資料，還有做可視化。
+
+大概花了一個月做出[DDDYOR.com](https://dddyor.com) ，可以從一個地址開始一步一步追查，看到相關的錢包，還有其中轉帳的金額，有點像是電影裡拉紅線追兇手的板子。
+![](/static/images/dddyor/demo.jpg)
+
+這篇文章分兩個部分
+
+1. 第一部分：產品的角度出發，解釋一下 DDDYOR 的功能，講講作為一個產品，實際上解決了什麼問題，還有遇到最大的阻礙。
+2. 第二部分：工程的角度出發，分享怎麼從零開始做一個"Web3"的網站，有什麼服務可以用，有什麼坑，有什麼技術難處。如果你是個工程師，像要試試 web3 的 project 可以看看我是怎麼從零到一的。
+
+## DDDYOR 是啥？
+
+DDDYOR 是 DD+DYOR 的結合，DD(due diligence)就是在交易世界裡坐好盡責查證的動作，DYOR(Do your own research)則是指更廣義的自己做好研究。兩件事其實有重疊，會選這個名字單純只是因為我買不到 DYOR 的域名 😂
+
+_這只是一個 Side Project 不是真的要賣產品，所以我就跳過宣傳詞，有興趣可以自己去[dddyor.com](https://dddyor.com)玩玩。_
+
+使用 DDDYOR 很簡單，輸入一個地址(或 ENS)就可以開始搜尋。
+
+- 選擇 DD 就會帶你到像是 linktree 的頁面，有很多外部連結可以看(ENS, Etherscan, Ape board, Cyberconnect, NFTScan, Prysm, Ethplorer)
+
+![](/static/images/dddyor/dd_result.png)
+
+- 選擇 DYOR 就會進入互動式的錢包連結頁面，從最初的那個地址開始，右邊會有一列他互動過的其他地址
+  - 可以按放大鏡搜尋（會確認是錢包還是合約，還有查 ens）
+  - 按+就能把另一個地址也加入圖中，圓的大小是錢包裡的 balance，連接線的粗細就是轉帳的金額
+  - 點新的那個點又可以開始下一輪的搜尋，搜尋過的錢包還是會留在圖上。
+
+放個 demo 影片可能比較好懂
+
+<iframe
+  width="560"
+  height="315"
+  src="https://www.youtube.com/embed/HhfHmz7v3fE"
+  title="YouTube video player"
+  frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>
+
+## 這個真的能做成產品嗎？
+
+我一開始做的假設是，**大家對了解別人、尤其是鯨魚(大戶)的錢包會有興趣**，要調查一個人也需要這種連結工具，才能看出錢包之間的關係。我在做的過程中有到一些 Discord 裡去問問大家的想法，結果發現散戶們其實沒有那麼大的興趣跟好奇心，去翻別人的錢包。看看其他工具，有不少有 smart money 的功能，但是都是已經分析好的結果，主要是拿來讓人跟單的。
+
+在做的過程中也遇到了難解的幾個技術難題：
+
+1. 不只有 Eth，其他鏈，其他代幣都要考慮才夠完整（做得到只是很不容易
+2. 錢進了交易所、合約，就很難看出來下一步的行為了
+3. 真的要躲避，進 tornado cash 就看不出來了（我有試著要查過駭客的錢包，結果就是全部進 tornado cash，結束）
+
+所以這個 poject 就執行了一個月，完成基本功能就打住了，當初發文還開玩笑寫，大概只有 IRS(美國國稅局)有興趣。不過，過了兩個月，在寫這篇文章的時候，又多做了點研究，**發現我其實說對了！這是一塊不小的市場，龍頭 Chainalysis 在 2021 年中就拿到了 42 億美金的估值**，不單純只是鏈上數據分析，還碰觸了非常多有趣的議題，探究 web3 的本質，還有新技術的可能發展。會再寫一篇分享我所做的研究，還有想法。
+
+[鏈上數據分析市場 | 文章預定地]()
+
+## 怎麼做一個簡單的"Web3"網站
+
+終於進入到工程的部分了，這邊章節標題的 Web3 放了引號，是要先聲明，這個網站不是一個 dApp(Decentralized Application)，嚴格意義上來只碰到 web3 的邊，僅有讀取，沒有跟區塊鏈互動，也沒有寫自己的智能合約。不過單是讀取，就能做很多事了，像是[Dune Analytics](https://dune.xyz/home) 和 [Etherscan](https://etherscan.io/) 都是讀取為主的公司。這也是我第一次串這些 API，所以如果有誤，歡迎留言告訴我，謝謝！
+
+### Web App 架構
+
+DDDYOR 就是個 web app，做 web app 不是這篇的重點，所以簡單把 Tech stack 寫一下，幫助理解架構。這次選擇了最簡單的 serverless，用了我最熟的 Firebase，拿來 hosting 還有做 API call。
+
+#### Frontend 前端
+
+**React.js** - 這其實是我第一次用 js 從頭開始做比較認真的 react 專案，我平常上班也用 react，但是是寫 clojurescript，所以我的 code 應該是難以見人。
+
+**Tailwind.css** - 我不是設計師，所以選了極簡的 UI，用了最簡單的方法做 styling，不用跟 css 搏鬥。
+
+[**React force graph**](https://github.com/vasturiano/react-force-graph) - 畫互動 Graph 的 library，基本上是這個 Project 的核心，他其實還有很多功能包含 3D，還有動畫，這次多做的只有畫交易量的粗細還有箭頭，還趁機回去複習了一下向量。
+
+#### Backend 後端
+
+這次只用了 Firebase Cloudfunction，把大部分對外 API call 都寫在 cloudfunction 上。
+
+### 怎麼拿 Blockchain 上的 Data？
+
+跟 Blockchain 互動有幾個不同層級的選擇：
+
+1. High-level -> 叫別人的 API，拿他準備好的資料(ex: Etherscan)
+2. Mid-level -> 叫節點 API，直接用節點跟區塊鏈互動(ex: Alchemy)
+3. Low-level -> 自己架節點，如果你可以自己架節點，我相信你不需要看這篇文章了
+
+我這次 High-level 跟 Mid-level 都有做，用了 Etherscan 去拿交易資料，用 Alchemy+ethers.js 拿 balance 還有 ens lookup。
+
+#### Etherscan API
+
+Etherscan 的 API 其實用起來很簡單，去[Etherscan](https://etherscan.io/apis) 註冊一個帳號，可以直接用 free plan，有一些限制，不過基本上個人 project 應該綽綽有餘。
+
+![](/static/images/dddyor/etherscan.png)
+
+用法可以參考他們的[Doc](https://docs.etherscan.io/) ，最基本的功能就是送 GET request，跟 API 拿資料。可以針對一個地址、智能合約、一筆交易等等，可以拿到不少有用的資料。
+
+唯一比較可惜的是，Etherscan 上有一些他們自己的 tag，像是交易所會寫 `FTX 12` ，智能合約會寫 `Opensea` 、`UniSwap`，API 裡沒有提供這些查詢。最接近的就是 contract name，但是還是會有些不同，像是 Opensea 的 contract name 是 Wyvern Exchange，沒辦法反查服務提供者會對理解資料有一定困難。
+
+Etherscan 的資料可以做一些基本的事，但是當你要做一些比較複雜的分析的時候，就會發現到處綁手綁腳，Blockchain 本身作為像是一個帳本只記錄交易的資料型態，在做某些特定的事的時候會很痛苦。我自己後來有用另一個叫 [Moralis.io](https://moralis.io/) 的 API，在某些情況更符合人體工學。也有聽說另一個 [The Graph](https://thegraph.com/en/) 也是 blockchain 資料的服務，有些更 web3 的設計，不過我自己是沒有用過。
+
+#### Alchemy 節點服務 + Ethers.js
+
+我想大部分的人都不可能自己架節點，所以要直接跟區塊鏈互動，RPC Node 節點服務就是個必需品。現在最大的兩家就是[Alchemy](https://www.alchemy.com/)和[Infura](https://infura.io/)(Etherscan 好像也有但是我這次沒用)，幾乎所有的 dApp call 都是透過他們，所以 web3 其實比想像中的還要中心化 😅。
+
+偏題了，回到節點，我這次用的是 Alchemy，使用起來也很簡單。註冊帳號，create app，選擇想要的鏈還有網路。我要拿真的數據所以就用了 Eth Mainnet，如果要做 dApp 開發可能會先用 testnet。費用的部分，基本上個人用也可以是完全免費的，Create 成功後就可以拿到 API key，你現在就有 Provider 了。
+
+![](/static/images/dddyor/alchemy.png)
+
+下一步，就是拿著這個 provider 去給你的 library 用，這次我用的是[ethers.js](https://docs.ethers.io/v5/)，主要原因是他在處理 ENS 上功能比較完整，[web3.js ](https://web3js.readthedocs.io/) 也很多人用，我也在 python 的 project 用過[web3.py](https://web3py.readthedocs.io/en/stable/) 。
+
+Ethers.js 有專門給幾個比較大的 provider 的 function 包含 Alchemy，設定 provider 就一行 code
+
+```javascript
+customHttpProvider = new ethers.providers.AlchemyProvider(null, 'Alchemy_API_key')
+```
+
+設定好之後就可以拿 Provider 去叫各種 function 了，就這麼簡單
+
+```javascript
+// ENS lookup
+ENS = await customHttpProvider.lookupAddress(address)
+
+// Get smart contract code
+code = await customHttpProvider.getCode(address)
+```
+
+本來想說，我想做的功能相對簡單，不用碰節點的東西，如果能一個 API 就拿到 data 最好，但是用了之後才發現其實根本沒那麼複雜，也開啟很多可能，甚至可以直接讀寫合約。有些 dApp 會直接讓 user 連他的 metamask，直接用 metamask 上的 RPC node (其實就是 infura)。**連結節點，進行操作，應該是 web3 工程師必備技能。**
+
+### 拿到 Data 了，然後呢？
+
+經過這些服務終於拿到我需要的 Data，可以把它套用到我想要畫的圖上了，但是在開發的過程中，我發現了一個大問題，貧窮限制了我的想像...
+
+一開始我是用我自己的地址來做測試，用圓和連接線大小來顯示金額，一切都還算合理。直到我做到一個階段，覺得不錯，來試試看 V 神的地址吧。沒試不知道，一試嚇一跳，鯨魚的地址的交易行為都是在另一個量級的，單純用大小粗細來顯示有時候會超級不成比例。
+
+我最後做的暫時解法，就是把圓的大小限制，所以不會有超小的浮游生物和超大的鯨魚，另外轉帳的部分，小額轉帳是紅綠色的，巨額轉帳則是紫金色的。這個問題應該可以有更好的解法，例如標準化整張圖，或是不要用線性數量當級距，用指數。
+
+但是最大的問題還是，地址的樣貌百百種，很難有 one-size-fit-all 的視覺話方法，真的要合理好用，勢必要做出很多細微的客製調整。
+
+## 做中學，學到了什麼？
+
+我自己覺得做中學是最適合我的學習方式，只是單方向聽，我的注意力很容易渙散。這次實作就學到了很多，從分析 web3 Project 的產品化可能性、動手實繼操作 API、分析鏈上資料、到視覺化成果。雖然從我的 Google analytics 數據來看，除了我 FB 貼文的那幾天，後來幾乎沒有使用者，但是以學習的角度，確實上了很好的一課。
+
+**✍🏼 Data 最終還是需要人**
+
+Eth 鏈上的 Data 是每秒 15 筆在產生，算上其他鏈，Data 多到看不完，也沒有任何壁壘，誰都看得到。作為一個小一點的 project，怎麼有效取得符合需求的 Data 是一個需要好好考量的事。更重要的，怎麼動手分析、解釋 Data 才是最重要的，大規模自動化分析數據的公司應該可以用算法去分析，但是我相信很多決定還是需要人的參與，畢竟這些 Data 背後也都是一個一個人的行為。
+
+**✍🏼 工具都在那裡等你了**
+
+一開始我還有點遲疑是否應該要盡量縮小專案的 scope，但是開始做之後發現很多工具都已經存在，也發展到一定程度很好用了，最困難的事情別人都已經幫你處理好了，其實不用擔心太多，動手做就會發現越做越快。
+
+**✍🏼 工程師的機會**
+
+比起我工作上互動比較複雜的 Web App，很多 NFT 的網頁，其實只需要把資訊展示好，兩個按鈕"Connect Wallet" "Mint" 就可以完成大部分功能了。我認為這是個機會，在 VR 或是其他元宇宙設備成為預設接觸的管道之前，Browser 依然會是一般使用者接觸 web3 的唯一管道，網頁工程師們不怕沒工作了！（幫我自己作為一個 web dev 開心一下）
+
+另一方面，這也是個警訊，要在這麼多人能力相似的人中出頭，勢必要有點不一樣的能力。或許 Smart Contract 是另一個必備技能，我這個 project 沒有碰合約的部分，之前線上課學過一點，感覺起來像是個易學難精的領域。
+
+之前在一個 talk 上聽到不只一個講者說「Web3 真的不需要什麼 blockchain engineer, smart contract engineer，需要的是"好的" Engineer」，智能合約也就是另一種程式碼，所有軟體工程的技能都還是需要的，只是換個戰場而已。**核心工程能力的提升，加上不斷學習新的技術，才是 Web3 工程師生存的方式 (或許也是任何工程師的生存方式 lol)**。
+
+## 相關資料
+
+我學習 Web 相關的工程知識一個很大的來源是[buildspace](https://buildspace.so/)，他有很多定期的 project，可以參加然後一步一步跟著他做，全部學完交作業還會給你一個 NFT，他們說這是 Learn to earn，蠻有趣的一個模式。

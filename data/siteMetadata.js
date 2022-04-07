@@ -2,7 +2,7 @@ const siteMetadata = {
   title: "Joey Wang's Blog",
   author: 'Joey Wang 王斯右',
   headerTitle: "Joey's Blog",
-  description: '科技新創 / Web Dev / Clojure / 美國生活',
+  description: 'Tech Startup / Web Dev / Clojure / Web3 / Living in Seattle',
   language: 'zh-tw',
   theme: 'dark',
   siteUrl: 'https://joeywang.blog',
