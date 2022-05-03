@@ -1,0 +1,250 @@
+---
+title: BAYC猴老大到底是誰？兩個維度分析NFT項目的健康度
+date: '2022-05-03'
+tags: ['Web3', 'NFT', 'projects', 'data']
+draft: false
+summary: 以BAYC為例，透過「持有者身價」、「持有者交易習慣」，了解NFT項目背後holder們的分布以及板塊改變
+images: []
+layout: PostLayout
+---
+
+每天都有一堆新的 NFT 項目，每個一定都會說自己很有搞頭，但是決定價格的還是持有者的共識。而所謂共識，講得簡單一點，其實就是一個一個地址的交易動作。覺得沒價值就低價拋售，覺得有價值就會有人拿一堆錢來搶。
+
+## 基本假設，兩個維度
+
+我想以 BAYC 為例，看能不能透過持有者的錢包分析 NFT 項目健康度。最基本的想法，是透過兩個維度來分析：
+
+1. 一個是持有者的身價(蝦 shrimp-鯨 whale，幣圈裡鯨魚指的是大戶人家，蝦子則是散戶)
+2. 另一個是持有者的交易頻率(紙 paper-鑽 diamond，NFT 裡紙手就是剛拿到就賣，鑽石手則是拿了就不會放的)
+
+如果把整個 NFT 項目想成一個完整的生態系，就知道需要有各式各樣的人才能維持健康。都是鑽石手就沒有流動性，都是紙手價格又會崩，很多鯨魚容易操控價格，太多蝦米根本沒有熱度。理想中，應該是要有一定的大戶 HODL 撐住基本面，中間有投機者向想要套利製造流動性，也有蝦米參與 FOMO 跟 FUD，其實就跟大多數的社群一樣，越多元越健康。
+
+## BAYC 作為實驗目標
+
+這次我把 BAYC 從 deploy 開始到上週(4/3,2022)，共 340 多天，所有 holder 都拿出來放上了這兩個維度，看看有沒有什麼有趣的發現，以下就是最後結果：
+
+![](/static/images/pdws/BAYC_pdws.gif)
+
+-> **X 軸是身價，算上 ETH 還有 NFT 總值**
+
+-> **Y 軸是交易頻率，是這個錢包每個 nft 的平均持有天數**
+
+-> **第三的維度顏色，則是從深到淺，代表入場時間從早到晚**
+
+兩個軸的計算方法都是以分析的當下計算，不是當時的數字，最主要可以看的就是顏色深淺的變化還有點的位置改變，代表著 OG 的猴老大們轉手給新的猴老大的過程。
+
+### 幾個有趣的 Finding
+
+- 右邊的點越來越多，代表持有的鯨魚也越來越多
+- x 軸 100 左右有條線，那代表的就是現在的 holder(BAYC 大概 100E 左右)，那條線往左，可能都是在換手的過程賣飛的
+- 淺色點集中在偏下，而且整體有往下的趨勢，可能代表隨著時間，更多 flipper 進場，可能是專職交易，或是一路 flip 上 BAYC
+
+### 可能的偏誤
+
+雖然說數據就是數據，但是我自己在做的過程中還是認知到幾個可能的偏誤：
+
+1. 我統計交易頻率的方式其實不是很準確，我只看 NFT transaction，包含的不只有交易，有可能是左右手互轉，或是轉一堆垃圾 NFT，如果有適當的方法依照價格加權，甚至算出一些賣飛或是爆擊的指數應該會更精準
+2. 大家可能都會把 BAYC 放進冷錢包，跟其他資產分開的話身價就會低估，很可能全部的點都要再偏右
+3. 單一地址能透露的訊息有限，如果能分析行為或是互動錢包找出同一持有者的其他錢包，可以提升資料的可信度
+4. 分析地址真的是一門學問，從我[上一篇做錢包可視化](https://joeywang.blog/blog/dddyor)就學到了重要的一課
+
+如果你在這個結果中有發現什麼，歡迎在下面留言區跟我討論。
+
+## 我怎麼做分析的？
+
+下面就是程式的部分了，老實說我好久沒有寫 python，也很久沒有處理資料相關的東西了，中間只能一直估狗。不過秉持著 Open garage 的精神，必須要分享一下我的破 Code，我最後懶得整理成可以直接 run 的 XD，就截取重要的部分分享。
+
+我這次用的工具是 Jupyter lab (我上次用的時候還只有 notebook)，基本的 Data 相關函示庫就是 pandas, numpy, matplotlib
+
+另外也用了幾個 Web3 的工具
+
+- [web3.py](https://web3py.readthedocs.io/en/stable/)，連上[Alchemy](https://www.alchemy.com/) provider 直接讀合約內容 (有興趣可以看我[上一篇](https://joeywang.blog/blog/dddyor)，其實連到區塊鏈非常簡單)
+- [Etherscan API](https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-erc721-token-transfer-events-by-address) 拿 ERC-721 交易紀錄
+- [Moralis.io](https://moralis.io/)，一個新發現的工具，有很多實用的 API，讓處理區塊鏈上的資料更符合人體工學，不用自己一筆一筆交易在那邊慢慢處理。我這次就用了他的 NFT price、transfer API，來拿資料（另一個原因是我一直申請不到 Opensea 的 API，賺這麼多還這麼小氣...）
+
+### Web3.py 連上區塊鏈
+
+透過 Alchemy 拿到 provider 就可以跟區塊鏈互動了
+
+```python
+from web3 import Web3
+alchemy_http_provider = Web3.HTTPProvider("https://eth-mainnet.alchemyapi.io/v2/API_KEY")
+w3 = Web3(alchemy_http_provider)
+if w3.isConnected():
+    print("Connected!")
+else:
+    print("Failed!")
+```
+
+連上 provider 之後就可以操作了，要對合約操作要先拿到合約的介面 ABI，可以在 etherscan contract 的分頁中拿到，連接上合約之後就可以直接 call 像是`ownerOf`, `tokenURI`這些 function 了。
+
+![](/static/images/pdws/abi.png)
+
+```python
+import json
+#BAYC
+abi = json.loads([ABI])
+contract_address = "0xBC4CA0EdA7647A8aB7C2061c2E118A18a936f13D"
+
+contract = w3.eth.contract(address=contract_address, abi=abi)
+
+totalSupply = contract.functions.totalSupply().call()
+
+print('Total Supply: ', totalSupply)
+print('Contract Name: ', contract.functions.name().call())
+print('Symbol: ', contract.functions.symbol().call())
+print('check start from id:')
+if contract.functions.ownerOf(0).call():
+    print('0')
+else:
+    print('not 0')
+
+```
+
+### 讀取 NFT 項目資料
+
+透過上面方式就可以讀到現在合約上的現況了，但是如果要拿歷史數據，就必須要回頭看交易資料，我用了 moralis 的 transfer 來讀取所有歷史資料，
+
+```python
+import pandas as pd
+import requests
+from datetime import datetime
+
+headers={"x-api-key" : 'MORALIS_API_KEY'}
+
+df = pd.DataFrame(columns=['to_address','from_address','tx_timestamp','token_id'])
+cursor = ""
+
+for p in range(0,total_pages+1):
+    url = "https://deep-index.moralis.io/api/v2/nft/"+ collection +"/transfers?address=" + collection\
+            + "&cursor=" + cursor
+    response = requests.get(url , headers=headers).json()
+    cursor = response['cursor']
+    for tx in response['result']:
+        tx_time = tx['block_timestamp'][:-5]
+        tx_timestamp = int(datetime.strptime(tx_time, "%Y-%m-%dT%H:%M:%S").strftime("%s"))
+        to_address = tx['to_address']
+        from_address = tx['from_address']
+        token_id = tx['token_id']
+        df2 = pd.DataFrame({'to_address': [to_address],
+                            'from_address': [from_address],
+                            'tx_timestamp': [tx_timestamp],
+                            'token_id': [token_id]})
+        df = pd.concat([df,df2], ignore_index=True, axis = 0)
+df.to_csv(collection +"tx_history.csv", sep='\t', index=False)
+```
+
+### 分析地址的 pdws 指數
+
+拿到所有交易紀錄後，就可以一天一天拆分，看看每天的 holder 都是哪些，接著就要進入最重要的部分，分析 holder 地址的兩個維度（紙 paper、鑽 diamond，鯨 whale、蝦 shrimp，我用的簡稱 pdws）
+
+```python
+# 下面兩個函式分別可以拿到錢包的balance還有NFT價格
+def get_address_balance(address):
+    addr = w3.toChecksumAddress(address)
+    return float(w3.fromWei(w3.eth.get_balance(addr), 'ether'))
+
+def get_past_month_lowest_price(collection):
+    if collection in nft_floor_price.keys():
+        return nft_floor_price[collection]
+
+    url = "https://deep-index.moralis.io/api/v2/nft/"+ collection +"/lowestprice?chain=eth&days=30&marketplace=opensea"
+    headers={"x-api-key" : 'MORALIS_API_KEY'}
+    try:
+        response = requests.get(url , headers=headers)
+
+        floor_price = float(w3.fromWei(float(response.json()['price']), 'ether'))
+        nft_floor_price[collection] = floor_price
+
+        return floor_price
+    except:
+        nft_floor_price[collection] = 0
+        return 0
+
+# 這個函式可以算出一個NFT的持有時間
+def get_address_nft_holding_time(address):
+    get_ERC721_url = "https://api.etherscan.io/api?module=account&action=tokennfttx&address=" \
+    + address + "&startblock=12292922&endblock=99999999&sort=asc&apikey=ETHERSCAN_API_KEY"
+    response = requests.get(get_ERC721_url)
+    holding_nft = {}
+    sold_nft = {}
+    now = datetime.timestamp(datetime.now())
+    try:
+        for tx in response.json()['result']:
+            token = tx['contractAddress']+"_"+tx['tokenID']
+            if token in holding_nft:
+                sold_nft[token] = float(tx['timeStamp'])-holding_nft[token]
+                del holding_nft[token]
+            else:
+                if token in sold_nft:
+                    del sold_nft[token]
+                holding_nft[token] = float(tx['timeStamp'])
+    except:
+        print(address, "failed")
+
+    for k,v in holding_nft.items():
+        holding_nft[k] = now - holding_nft[k]
+
+    return holding_nft, sold_nft
+
+# 把錢包裡的錢還有所有NFT價值加起來就是身價 (鯨蝦)
+# 平均一下NFT持有時間就是交易習慣（紙鑽）
+def get_address_pdws(address):
+    holding_nft, sold_nft = get_address_nft_holding_time(address)
+    # get avg holding days
+    duration = 0
+    for d in sold_nft.values():
+        duration += d
+    for d in holding_nft.values():
+        duration += d
+    if len(sold_nft)+len(holding_nft) == 0:
+        avg_holding_days = 0
+    else:
+        avg_holding_days = (duration/(len(sold_nft)+len(holding_nft)))/(60*60*24)
+
+    # get net worth
+    networth = get_address_balance(address)
+    for nft in holding_nft:
+        networth += get_past_month_lowest_price(nft.split('_')[0])
+
+    return [networth, avg_holding_days]
+```
+
+當然中間可能可以做一些優化，像是拿過的 collection 價格就可以存起來不用重要一次，已經查過的地址也都可以存起來下次跳過。整個過程其實還是要花蠻久時間的，因為有些猴老大的交易歷史、口袋裡的 NFT 多到爆炸。
+
+### 畫圖
+
+最後再用 matplotlib 畫圖就完成了，這邊我把前面的資料每天存成一個 csv，一天一天讀出來畫一張圖
+
+```python
+for day in range(0,347):
+    one_day_data_csv = pd.read_csv("./BYAC/day_"+ str(day) +".csv", sep='\t')
+    one_day_data_csv['day_n'] = 0
+    one_day_data_csv.loc[one_day_data_csv.whale_shrimp >= 999, 'whale_shrimp'] = 999
+    one_day_data_csv.loc[one_day_data_csv.paper_diamond >= 364, 'paper_diamond'] = 364
+    for i,r in one_day_data_csv.iterrows():
+        one_day_data_csv.loc[i, 'day_n'] = all_owners[r['address']][2]
+    print(len(one_day_data_csv))
+    plt.rcParams["figure.figsize"] = [10,10]
+    plt.rcParams['figure.dpi'] = 200
+    plt.figure(facecolor='white')
+    date = datetime.fromtimestamp(1619158420+day*86400)
+    plt.title("BAYC Holder  " + date.strftime("%m / %d - %Y"))
+    plt.scatter(one_day_data_csv.whale_shrimp, one_day_data_csv.paper_diamond, s=2, c=one_day_data_csv.day_n/347*100, cmap='plasma', vmin=0, vmax=100)
+    #plt.xlabel("whale_shrimp")
+    #plt.ylabel("paper_diamond")
+    plt.xlim(-10, 1100)
+    plt.ylim(-10, 375)
+    plt.plot()
+
+    plt.savefig('./BYAC/img/'+ str(day) +'.png')
+    plt.clf()
+    plt.close()
+```
+
+### Day1 vs Day346, What a crazy year
+
+回頭看這些數字這些圖，幣圈 NFT 真的是油門催到底，幾乎忘了 BAYC 也不過是一年的事。
+
+<Image alt="gix" src="/static/images/pdws/1.png" width={350} height={350} />
+<Image alt="gix-snow" src="/static/images/pdws/346.png" width={350} height={350} />
