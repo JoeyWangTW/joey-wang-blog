@@ -6,16 +6,22 @@ const projectsData = [
     href: 'https://dddyor.com',
   },
   {
-    title: 'Personal Site (Work In Progress)',
-    description: `personal website, portfolio. Still work in progress to build more on it.`,
-    imgSrc: '/static/images/personal-site.png',
-    href: 'https://www.szuyuwang.com',
+    title: 'My Digital Garage',
+    description: `Following the book "show your work", this is a digital space that shows projects that I've worked on, still working, or failed.`,
+    imgSrc: '/static/images/garage.png',
+    href: 'https://joeywangtw.notion.site/Joey-s-Garage-33f469b2cce34607b7989067b20bce67',
   },
   {
     title: 'Youtube Channel',
     description: `A place where I share my life, career and tech`,
     imgSrc: '/static/images/youtube.png',
     href: 'https://www.youtube.com/user/TheJoeywang123',
+  },
+  {
+    title: 'Personal Site (Work In Progress)',
+    description: `personal website, portfolio. Still work in progress to build more on it.`,
+    imgSrc: '/static/images/personal-site.png',
+    href: 'https://www.szuyuwang.com',
   },
 ]
 
