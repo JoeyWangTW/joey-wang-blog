@@ -1,0 +1,104 @@
+---
+title: 左右互搏，用ChatGPT開發ChatGPT專用Chrome插件
+date: '2023-04-03'
+tags: ['AI', 'Web-dev', 'Projects']
+draft: false
+summary: 用了一個週末早上，跟AI協作一個插件，解決自己每次等GPT講話都會忘記回來的問題。AI協作真的是個高效的過程，跟自己從零學習開發是個很不一樣的體驗。
+images: []
+layout: PostLayout
+---
+
+# ChatGPT Notifier
+
+## 解決自己的痛點
+
+每次在等 ChatGPT 回答的時候，常常會跳到別的分頁開始耍廢，然後就忘了回來，ChatGPT 省下的時間又被我浪費了。所以上個週末決定來做一個小插件，讓他寫完的時候就播個提示音，我就知道該回神了。我沒有花太多心力去找有沒有人做過這件事，畢竟更重要的是我想看看怎麼跟 ChatGPT 協作。（後來認真查了一下果然真的已經有了現有的）
+
+(先附上連結 [ChatGPT Notifier Chrome extension](<[https://chrome.google.com/webstore/detail/chatgpt-notifier/kpbihpkcpnfnjddplngmbljcfofjgejh/related?hl=zh-TW&authuser=0](https://chrome.google.com/webstore/detail/chatgpt-notifier/kpbihpkcpnfnjddplngmbljcfofjgejh/related?hl=zh-TW&authuser=0)>))
+
+## 與 ChatGPT 協作
+
+**這次整個插件的程式大概 99％都是 ChatGPT(GPT4)完成的，過程也都是看著他的提示來執行的。整個對話也就來回了四五次，有幾個還是我在改 prompt。從開始到結束大概花了半小時在做插件，三個小時在畫 icon、做鈴聲、填審查表格。**
+
+經過這次的經驗，這種解決自已問題的小工具真的都可以自己 DIY，畢竟花時間找或是花錢買可能不能完全客製化，還更麻煩。也提供了不會寫程式的人一些實作的機會。
+
+### Chrome 插件開發
+
+我沒有做過 chrome 插件，所以我先讓他跟我解釋一下流程，大概知道需要哪些檔案還有哪些格式。其實不複雜，也就是在網頁上加上額外的程式，有個`manifest.json`填寫插件的資料，其他幾個 js 檔負責執行。›
+
+![](/static/images/chatgpt/manifest_image.png)
+
+接著我看了一下 ChatGPT 頁面上 HTML，發現他還在回答的時候會有一個”result-streaminng”的 class，有了這個條件就很好執行了。**於是我就把我的需求跟 ChatGPT 說：「有”result-streaming” class 的時候準備一個 listener, 當 class 不見的時候就播提示音」**
+
+這個提示我來回了一兩次，第一次他只在一開始執行而不是持續的偵測。Prompt Engineering 真的是一門學問，prompt 講得越清楚明確越快得到需要的效果。
+
+[Prompt Engineering 學習網站 - Learn Prompting](https://learnprompting.org/)
+
+![](/static/images/chatgpt/steps.png)
+
+在照著他之前給的流程裝到 chrome 上後，出現了 manifest version 的問題，現在要用的 version 3 應該是沒有被 train 到。但是透過錯誤訊息也蠻容易解決的。成功解決這個 bug 之後，試了一下，功能正常，完成了！出乎我意料的快，我又請他解釋一下 code 讓我自己看一下他是怎麼做的，仔細看一下應該還是有改進的空間，在來回個幾次應該可以更優化，不過整體來說已經很完整了。
+
+[GitHub page](https://github.com/JoeyWangTW/ChatGPT-notifier)
+
+[完整跟 ChatGPT 的對話過程](https://github.com/JoeyWangTW/ChatGPT-notifier/blob/main/prompts/extention_v0.md)
+
+### 設計 Icon 圖
+
+處理完程式的部分，我又花了點時間試圖生成 icon 還有提示音。用 Midjourney 產生一個簡易的向量 icon 但是一直沒有辦法拿到我想要的，在 Figma 裡面隨意地拉了一個又很醜（我果然不是當設計師的料…），在經過幾次來回之後決定用一個立體的，加 logo 去背之後就定稿了。
+
+![](/static/images/chatgpt/robot.png)
+
+![](/static/images/chatgpt/notification.png)
+
+### 合成提示音
+
+提示音的部分，我不想用現成的，於是我也讓 ChatGPT 試圖用 Clojure 產出一個提示音檔。其中他用了 overtone 這個 library，但是我一直遇到環境設定的問題，也沒辦法好好的執行 repl 來幫助開發。一陣子之後我就暫時放棄了，畢竟這不是我的主要目的。但有機會我還是想再是一次，看看到底是我沒做對，prompt 寫不清楚，還是他就是缺少足夠的 clojure 資料。
+
+暫時放棄程式生成聲音，只好退而求其次，讓他教我怎麼用 Garageband 來做，還好一切沒有太困難，試了一下就產出了一個小小的提示音。
+![](/static/images/chatgpt/garageband.png)
+
+### 上傳到 Marketplace
+
+一切都準備好也測試過之後，就照 ChatGPT 之前提示過的，打包好上傳。要能夠成功上架需要經過審查，所以在花了點時間把內容說明和必要的資料都填好之後就是等他通過了…
+
+![](/static/images/chatgpt/publish.png)
+
+## 吃著火鍋還唱著歌，突然就被 google 拒絕了
+
+![](/static/images/chatgpt/decline.png)
+
+這篇文章到這邊為止，在上傳受審之後就寫好了，本來以為會很快，想說可直接發。
+
+沒想到，過兩天 google 就回覆我拒絕上架，因為列出了沒有用到的權限。我回頭認真一看，`manifest.json` 裡有著一行
+
+```jsx
+"permissions": ["tab", "storage"]
+```
+
+我當初沒有特別注意，以為是一些模板，沒想到是 ChatGPT 自已掰出來多餘的東西。Google 審查也蠻嚴格的，沒有用到的權限就應該要，於是就拒絕上架要求我修改。認真的看了一下[文件](https://developer.chrome.com/docs/extensions/mv3/manifest/)後發現真的被加了幾個用不到的權限要求，只好移除後重新送審。
+
+終於又等了兩天後成功上架！
+
+[Chrome extension 連結](<[https://chrome.google.com/webstore/detail/chatgpt-notifier/kpbihpkcpnfnjddplngmbljcfofjgejh/related?hl=zh-TW&authuser=0](https://chrome.google.com/webstore/detail/chatgpt-notifier/kpbihpkcpnfnjddplngmbljcfofjgejh/related?hl=zh-TW&authuser=0)>)
+
+## ChatGPT Notifier 的下一步
+
+接下來可以考慮加入更多的功能，例如讓使用者可以設定提示音的種類、音量大小等等。也可以設計一個更豐富的圖示來讓插件更加吸睛。另外，可以考慮加入更多的 ChatGPT 功能，例如自動回復訊息等等，讓插件更加實用。
+
+以上這段是 Notion.AI 寫的，還真的是我想做的些東西，調整音量、自己上傳提示音、甚至讓他唸出來給你聽。我也讓 Notion.AI 給了點建議，以下…
+
+> 此外，我建議您在網路上尋找其他使用者的反饋和建議，以了解您的插件在使用者心目中的優點和缺點。這可以幫助您更好地了解使用者的需求和期望，進一步改進和優化您的插件。同時，也可以考慮向其他開發者和社群交流和分享您的經驗和心得，這樣有助於擴大您的視野和獲取更多寶貴的資訊。最後，祝您在未來的開發和創新之路上一切順利！
+
+# AI 浪潮是無可避免的
+
+在做的過程中有幾個感觸
+
+1. 溝通能力不再只是軟實力。Prompt engineering 、AI 詠唱是大家都在說重要的技能，但是實際上來說，更核心的是把“人話”說清楚的能力。那些詠唱技能都是附加在能夠組織清楚語言的基礎上的。這次我唯一覺得 prompt 不能得到滿意結果的，大概就是想用 midjourney 生一個 icon 但是一直沒有適合的產出。
+2. 一點點經驗 + AI 效率更好。因為有些前端的經驗，我可以猜想網站上是怎麼實作的。用開發者工具就很快的發現，他講話完話有個”result-steaming”的 class 會被拿掉。因此在要求 ChatGPT 寫程式的時候，就已經把明確的解法給他了，少了很多額外的來回。再者，其實連 OpenAI 在發表會上都有說：「不要直接用 AI 寫的 code」，這次就體會到了，因為一個多餘的權限，要重新等審查兩天，讀懂 code 還是必要的技能。
+3. 當大家都在淘金的時候，賣鏟子就是一門好生意。這也是我做這個插件的最初想法，AI 的應用每天都在突破，但回過頭來，幫這些應用做些應用或許也是個好機會。這麼多人每天在用，一定還有很多痛點值得被解決，我應該會再陸陸續續做幾個來玩玩。
+
+## 下一步
+
+最近 AI 工具、技術真的是以天為單位在不斷突破，興奮、讚嘆的同時也帶著一些焦慮，覺得充滿未知的挑戰，也怕自已跟不上。經過幾次跟 AI 協作的體驗，我相信未來必然會有更多的機會，而且越能高效協作的人越能夠槓桿更多資源。
+
+除了跟上加入所有的 waitlist，體驗最新的 AI API、工具之外，我也會花點時間想想和觀察，到底有哪些在這波熱潮中帶出的痛點，需要一個鏟子的解法來解決的。有了 AI 工具的協助，測試這些點子也都有更快的迭代速度，相信會有更多有趣的 Project 可以做的。
