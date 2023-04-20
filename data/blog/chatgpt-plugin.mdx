@@ -1,0 +1,158 @@
+---
+title: 讓 ChatGPT Plugin 幫我做一杯「Irish Curdling cow」調酒
+date: '2023-04-19'
+tags: ['AI', 'Web-dev', 'Projects']
+draft: false
+summary: 拿到了ChatGPT Plugin的測試名額，做了一個小小的範例，一次次的被ChatGPT Plugin的威力還有超輕鬆的開發流程驚艷
+images: []
+layout: PostLayout
+---
+
+> ChatGPT plugin 公佈的時候，我覺得這一定會開啟無限可能，果然沒讓我失望。
+
+上週末終於排到了 ChatGPT plugin 的 Developer Alpha，有點不知道要從何下手，於是找了一個[youtube tutorial](<[https://www.youtube.com/watch?v=kHVkAvxkuy8](https://www.youtube.com/watch?v=kHVkAvxkuy8)>) 一步一步跟著。他做的是一個匯率的 plugin，我找到了另一個調酒的 API，決定就直接轉接拿來用用看。
+
+不動手不知道，一動手嚇一跳。雖然說叫 ChatGPT 給你酒譜其實不需要 plugin，但是這次讓我驚艷的不是他給的答案，而是整個開發流程，還有 Plugin 本身的運作方式。
+
+## ChatGPT Plugin 是什麼？
+
+在開始講我做的 plugin 之前，來快速解釋一下 ChatGPT plugin 是什麼。**簡單來說就是給 ChatGPT 跟外界世界溝通的能力**，現在的 ChatGPT 只有到 2021 九月的知識，像是問他這次經典賽是誰把 Mike Trout 三振他就沒辦法回答了。除此之外，他的知識來源只有公開的資料，如果有任何非公開的內容他也沒辦法回答。
+
+Plugin 就提供了一個機會讓他可以連接外面的資料，其中官方的 Browsing 就可以讓他直接上網。其中一個現有的 Expedia plugin 就可以安排行程查機票。除此之外，有趣的是他還能幫你執行動作，現在 Expedia 還沒有這個功能，不過可以想像一但你給 ChatGPT 你的 Expedia 帳號權限，查完機票確認好他就就直接幫你訂了。
+
+一開始在發表會上一開始看到，老實說我在想：「連網確實開啟了很多可能，但是如果每個 API 還要針對 ChatGPT 去詳細講該怎麼做，那還是有很多 Work 要做」。但是經過這一次開發，也更詳細的看了 Doc，這個疑慮就完全被打破了，真的有種腦洞大開的感覺。
+
+![](https://media1.giphy.com/media/lXu72d4iKwqek/giphy.gif)
+
+[ChatGPT Plugin 官方介紹](<[https://openai.com/blog/chatgpt-plugins](https://opena.com/blog/chatgpt-plugins)>)
+
+## 寫 code 這麼簡單的事，就交給 ChatGPT 吧！
+
+我看的 youtube 教學裡，他其實就是找了一個 API，接著就讓 ChatGPT 寫一個 python flask 後端去叫那些已經做好的 API。於是我也依樣畫葫蘆，找了這個 [Cocktail DB](<[https://rapidapi.com/thecocktaildb/api/the-cocktail-db/](https://rapidapi.com/thecocktaildb/api/the-cocktail-db/)>) 的 API，把他轉手交給 ChatGPT。
+
+我先選定了一個會返回一個隨機調酒的 end point，給的 prompt 如下
+
+```jsx
+I want to create a flask server that have an API end point
+that calls an external cocktail API which get a random cocktail.
+Here's a code snippet of the API I want to call:
+
+///
+在這邊把API網頁上的範例貼上來
+...
+```
+
+馬上就得到一個可以用的 code 了
+
+![](/static/images/plugin/flask_prompt.png)
+
+我照著教學裡，選了個簡單的方法在 [replit](<[https://replit.com/](https://replit.com/)>) 上 deploy，當然也直接問了 ChatGPT，稍微改了一下 code，點了`Run`輸入預覽網址 + `/api/random_cocktail`就拿到資料了。後來我又陸續加了另外兩個 End point，用材料查調酒還有用 ID 查調酒的詳細酒譜。
+
+(中間遇到了一個 bug，後來發現少 import 了一個 module，ChatGPT 都提醒我要加了，我還是漏看了，人工智慧心很累)
+
+![](/static/images/plugin/ingredient.png)
+
+**一開始我還想說這麼簡單的應用應該自己寫一下更快，但是我錯了，ChatGPT 還是更快。更重要的是，可以透過前後文關聯，讓後面要生成 Plugin 的定義文件時，直接一鍵產出。**
+
+## 讓 Plugin 讀懂 API
+
+[OpenAI Chat Plugin Document](<[https://platform.openai.com/docs/plugins/introduction](https://platform.openai.com/docs/plugins/introduction)>)
+要讓 Plugin 運作，需要提供兩個文件
+
+### Plugin Manifest
+
+放在`yourdomain.com/.well-known/ai-plugin.json`，包含 metadata 和簡介，如果需要 Auth 也在這裡定義。
+
+### OpenAPI Specificatio
+
+這個是一個通用的 OpenAPI 的的規範，會以 yaml 或是 json 的形式來描述你的 API，包含 end point 怎麼叫、會給出什麼回應，還有最重要的**description**，This is where the magic happens。
+
+ChatGPT 真的「看懂」怎麼用這個 API 就是透過這個 description。[官網的文件](<[https://platform.openai.com/docs/plugins/getting-started/writing-descriptions](https://platform.openai.com/docs/plugins/getting-started/writing-descriptions)>)裡有個部份就在講該怎麼寫出好的 description，其中有幾個綱要
+
+1. 不要試著控制 ChatGPT 回應的人格、狀態或是講什麼話
+2. 不要試圖讓 ChatGPT 在使用者沒有明確需要的時候啟動 plugin
+3. 不要指示特定的觸發機制
+4. 不要回傳自然語言，回傳 Raw data
+
+用白話文來說，就是「**API 就好好做 API 該做的事，講清楚所有 end point 在做什麼就好。把”Smart”的部份留給 ChatGPT，不要隨便干擾他**」
+
+這個部分的實作，我也沒做什麼事，manifest 很簡單，我只加了一個 icon 圖示。OpenAPI 的部份，因為我前面在寫 code 的 prompt 已經講了我 end point 大概都想做什麼，我就把 Doc 複製貼上給他，直接請 ChatGPT 一鍵生成，馬上就搞定了。
+
+```jsx
+can you generate a openai.yaml definition for
+the api end point based on this doc?
+
+///
+複製貼上Plugin OpenAPI definition章節
+OpenAPI definition
+The next step is to build the OpenAPI specification to document the API......
+```
+
+當然這種比較長的文件還是要等一下，尤其是用 GPT-4 的時候，所以我都用我自己寫的 [ChatGPT Notifier](<[https://chrome.google.com/webstore/detail/chatgpt-notifier/kpbihpkcpnfnjddplngmbljcfofjgejh](https://chrome.google.com/webstore/detail/chatgpt-notifier/kpbihpkcpnfnjddplngmbljcfofjgejh?hl=zh-TW&authuser=0)>) Chrome 插件，等他寫好提醒我，我就可以從看 youtube 的耍廢狀態中回來了。（哈哈還是無恥業配一下，有興趣知道我怎麼做出這個插件可以看[這篇: **左右互搏，用 ChatGPT 開發 ChatGPT 專用 Chrome 插件**](<[https://joeywang.blog/blog/chatgpt-notifier](https://joeywang.blog/blog/chatgpt-notifier)>)）
+
+## 安裝 Cocktail Generator 插件
+
+安裝 Plugin 也很容易，如果有 plugin 的 Alpha 就可以看到這個介面，點選 plugin→plugin store→ 右下角 Develop your own plugin，就會讓你填你的 end point 的 url
+
+![](/static/images/plugin/plugin.png)
+
+填好之後他會試著 fetch 剛剛說的 manifest 還有 OpenAPI spec，都找到後就可以安裝了。
+
+![](/static/images/plugin/manifest.png)
+
+![](/static/images/plugin/found_plugin.png)
+
+## 實際使用 Cocktail Generator Plugin
+
+不囉唆直接上使用圖，我問他「我有一瓶波本，我要做什麼給朋友喝？」，他馬上自動叫了 ingredient 的那個 end point，列出一個酒的列表。
+
+更猛的是，他還知道有另一個 endpoint 可以提供酒譜，所以他說選好之後我可以給你酒譜和調酒步驟。
+
+![](/static/images/plugin/first_prompt.png)
+
+於是我挑了 7 號「Irish Curdling Cow」，他就用了那個 id 來叫另一個用 ID 搜酒譜的 end point，給了我一個詳細指示。
+
+![](/static/images/plugin/second_prompt.png)
+
+點開插件詳細資料看一下 Raw data，其實以人類的角度看起來都不是很好懂，基本上是沒領薪水，我是不會花任何時間去理解的那種。但是他就是能清楚地找到該挑出什麼，然後寫成人看得懂的語言，真的是一再的被震驚了。
+
+![](/static/images/plugin/first_raw.png)
+
+![](/static/images/plugin/second_raw.png)
+
+## Plugin 很強很棒，然後勒？
+
+講到這裡可能還是有人會懷疑「啊不用插件 ChatGPT 也會給調酒酒譜啊？」確實沒錯，但是跳出這個小小範例，如果今天串的是一個保險公司的機密「業務交戰守則」資料庫，只要把幾個調用資料庫的接口寫好，就可以針對各種情況，用對話的方式拿到想要的守則，甚至還能夠混搭、串連。這麼說應該更能感受到它的威力了吧？
+
+做完這個範例，我暫時還沒有想到有什麼殺手級應用，但是想到了幾個反思
+
+### 前端工程師要失業了
+
+Hold on！我知道大家已經聽膩這個了，但是作為一個全端工程師，我也做前端，要好好解釋我想說什麼。直接說前端要被取代還是有點誇張，**或許應該這麼說，任何比 Chat 更爛的前端交互模式、介面，都可以省下來了**。
+
+對於電商這種想要讓使用者多逛一下的網站可能不適合。如果是那種使用者已經明確知道要做什麼，但是連上網站後，還要點來點去，找來找去，這種可能就很適合直接串接 Plug in。公司可以省下 Designer, UXR, Frontend，只需要把後端的 API 寫好，使用者可以用 Chat 的介面完成工作，放便又迅速，是個雙贏的局面。
+
+### 只要是寫給人看的 API 都可以輕鬆串
+
+我說想不到殺手級應用，主要的原因就是我現在手邊根本沒有現成的 API 服務，但是對於已經有 API 服務的很多公司，下一步充滿了可能性。
+
+**現有的 API 幾乎都是寫給人看的，畢竟叫 API 的之前都是另一個工程師，所以要讓 Plugin 看懂其實應該只需要做些微調。甚至有機會，把 code 直接給 ChatGPT 看，他也能夠理解並且寫出相對應需要的說明文件**。這樣的開發流程，對工程師來說應該是非常愜意的，少了很多無聊的寫文件工作。
+
+同時也代表，現存的 API 都很有機會花少少的成本就接進 ChatGPT，越多資源加入後，群魔亂舞的戰國時代，不知道會開啟什麼樣的體驗。
+
+### 打字速度是你的超能力
+
+在 AI 爆發的今天，誰跟 AI 熟誰就更佔優勢。**其中當然不只打字速度，更重要的 prompting 能力會大大決定你得出的成果**。雖然有 AutoGPT 這樣的全自動工具，但我猜協作還是現階段的主要方式。
+
+在做這個練習的時候，我一直在幾個分頁中切換，youtube 教學、範例程式、我的程式、Plugin 文件、ChatGPT，老實說還是有點慢的。可以想像如果一切都串好，我就只要在 ChatGPT 上做所有的互動，讀寫直接完成，甚至手不用離開鍵盤，這樣的生產效率想到都不自覺的笑出來了。
+
+## 結語
+
+如果你也有拿到 Plugin 的權限，可以考慮跟著我看的這個 [youtube tutorial](<[https://www.youtube.com/watch?v=kHVkAvxkuy8](https://www.youtube.com/watch?v=kHVkAvxkuy8)>) 做一次試試看，自己動手感受真的不一樣。
+
+AI 的工具真的是每天都在更新，看到都有點膩了，但是每次有新的東西一試還是會嚇一跳。這次應該算是早拿到 Plugin 的權限，有幸玩了一下，體驗了一回。現有上架的插件都還偏陽春，但是就像我前面說的，當更多資源加入，故事就會變得有趣起來，我們可以好好期待一下。相信 Plugin 的應用還有威力應該遠遠大於我現在感受的，如果你有什麼不同的想法歡迎跟我一起討論。
+
+最後的最後，當然不免俗的要來真的調一下這杯酒。我發現我其實根本沒有波本，我的 Maker's Mark 空了，不過我有 bourbon cream，意思應該差不多吧！
+真的跟字面上的一樣，凝結的牛奶，口感像鹹豆漿，喝起來有奶味有酸味像是優酪乳，是杯神奇的調酒。
+
+![](/static/images/plugin/irish_curdling_cow.JPG)
