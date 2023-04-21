@@ -10,7 +10,7 @@ layout: PostLayout
 
 > ChatGPT plugin 公佈的時候，我覺得這一定會開啟無限可能，果然沒讓我失望。
 
-上週末終於排到了 ChatGPT plugin 的 Developer Alpha，有點不知道要從何下手，於是找了一個[youtube tutorial](<[https://www.youtube.com/watch?v=kHVkAvxkuy8](https://www.youtube.com/watch?v=kHVkAvxkuy8)>) 一步一步跟著。他做的是一個匯率的 plugin，我找到了另一個調酒的 API，決定就直接轉接拿來用用看。
+上週末終於排到了 ChatGPT plugin 的 Developer Alpha，有點不知道要從何下手，於是找了一個[youtube tutorial](https://www.youtube.com/watch?v=kHVkAvxkuy8) 一步一步跟著。他做的是一個匯率的 plugin，我找到了另一個調酒的 API，決定就直接轉接拿來用用看。
 
 不動手不知道，一動手嚇一跳。雖然說叫 ChatGPT 給你酒譜其實不需要 plugin，但是這次讓我驚艷的不是他給的答案，而是整個開發流程，還有 Plugin 本身的運作方式。
 
@@ -24,11 +24,11 @@ Plugin 就提供了一個機會讓他可以連接外面的資料，其中官方�
 
 ![](https://media1.giphy.com/media/lXu72d4iKwqek/giphy.gif)
 
-[ChatGPT Plugin 官方介紹](<[https://openai.com/blog/chatgpt-plugins](https://opena.com/blog/chatgpt-plugins)>)
+[ChatGPT Plugin 官方介紹](https://opena.com/blog/chatgpt-plugins)
 
 ## 寫 code 這麼簡單的事，就交給 ChatGPT 吧！
 
-我看的 youtube 教學裡，他其實就是找了一個 API，接著就讓 ChatGPT 寫一個 python flask 後端去叫那些已經做好的 API。於是我也依樣畫葫蘆，找了這個 [Cocktail DB](<[https://rapidapi.com/thecocktaildb/api/the-cocktail-db/](https://rapidapi.com/thecocktaildb/api/the-cocktail-db/)>) 的 API，把他轉手交給 ChatGPT。
+我看的 youtube 教學裡，他其實就是找了一個 API，接著就讓 ChatGPT 寫一個 python flask 後端去叫那些已經做好的 API。於是我也依樣畫葫蘆，找了這個 [Cocktail DB](https://rapidapi.com/thecocktaildb/api/the-cocktail-db/) 的 API，把他轉手交給 ChatGPT。
 
 我先選定了一個會返回一個隨機調酒的 end point，給的 prompt 如下
 
@@ -46,7 +46,7 @@ Here's a code snippet of the API I want to call:
 
 ![](/static/images/plugin/flask_prompt.png)
 
-我照著教學裡，選了個簡單的方法在 [replit](<[https://replit.com/](https://replit.com/)>) 上 deploy，當然也直接問了 ChatGPT，稍微改了一下 code，點了`Run`輸入預覽網址 + `/api/random_cocktail`就拿到資料了。後來我又陸續加了另外兩個 End point，用材料查調酒還有用 ID 查調酒的詳細酒譜。
+我照著教學裡，選了個簡單的方法在 [replit](https://replit.com/) 上 deploy，當然也直接問了 ChatGPT，稍微改了一下 code，點了`Run`輸入預覽網址 + `/api/random_cocktail`就拿到資料了。後來我又陸續加了另外兩個 End point，用材料查調酒還有用 ID 查調酒的詳細酒譜。
 
 (中間遇到了一個 bug，後來發現少 import 了一個 module，ChatGPT 都提醒我要加了，我還是漏看了，人工智慧心很累)
 
@@ -56,7 +56,7 @@ Here's a code snippet of the API I want to call:
 
 ## 讓 Plugin 讀懂 API
 
-[OpenAI Chat Plugin Document](<[https://platform.openai.com/docs/plugins/introduction](https://platform.openai.com/docs/plugins/introduction)>)
+[OpenAI Chat Plugin Document](https://platform.openai.com/docs/plugins/introduction)
 要讓 Plugin 運作，需要提供兩個文件
 
 ### Plugin Manifest
@@ -67,7 +67,7 @@ Here's a code snippet of the API I want to call:
 
 這個是一個通用的 OpenAPI 的的規範，會以 yaml 或是 json 的形式來描述你的 API，包含 end point 怎麼叫、會給出什麼回應，還有最重要的**description**，This is where the magic happens。
 
-ChatGPT 真的「看懂」怎麼用這個 API 就是透過這個 description。[官網的文件](<[https://platform.openai.com/docs/plugins/getting-started/writing-descriptions](https://platform.openai.com/docs/plugins/getting-started/writing-descriptions)>)裡有個部份就在講該怎麼寫出好的 description，其中有幾個綱要
+ChatGPT 真的「看懂」怎麼用這個 API 就是透過這個 description。[官網的文件](https://platform.openai.com/docs/plugins/getting-started/writing-descriptions)裡有個部份就在講該怎麼寫出好的 description，其中有幾個綱要
 
 1. 不要試著控制 ChatGPT 回應的人格、狀態或是講什麼話
 2. 不要試圖讓 ChatGPT 在使用者沒有明確需要的時候啟動 plugin
@@ -88,7 +88,7 @@ OpenAPI definition
 The next step is to build the OpenAPI specification to document the API......
 ```
 
-當然這種比較長的文件還是要等一下，尤其是用 GPT-4 的時候，所以我都用我自己寫的 [ChatGPT Notifier](<[https://chrome.google.com/webstore/detail/chatgpt-notifier/kpbihpkcpnfnjddplngmbljcfofjgejh](https://chrome.google.com/webstore/detail/chatgpt-notifier/kpbihpkcpnfnjddplngmbljcfofjgejh?hl=zh-TW&authuser=0)>) Chrome 插件，等他寫好提醒我，我就可以從看 youtube 的耍廢狀態中回來了。（哈哈還是無恥業配一下，有興趣知道我怎麼做出這個插件可以看[這篇: **左右互搏，用 ChatGPT 開發 ChatGPT 專用 Chrome 插件**](<[https://joeywang.blog/blog/chatgpt-notifier](https://joeywang.blog/blog/chatgpt-notifier)>)）
+當然這種比較長的文件還是要等一下，尤其是用 GPT-4 的時候，所以我都用我自己寫的 [ChatGPT Notifier](https://chrome.google.com/webstore/detail/chatgpt-notifier/kpbihpkcpnfnjddplngmbljcfofjgejh?hl=zh-TW&authuser=0) Chrome 插件，等他寫好提醒我，我就可以從看 youtube 的耍廢狀態中回來了。（哈哈還是無恥業配一下，有興趣知道我怎麼做出這個插件可以看[這篇: **左右互搏，用 ChatGPT 開發 ChatGPT 專用 Chrome 插件**](https://joeywang.blog/blog/chatgpt-notifier)）
 
 ## 安裝 Cocktail Generator 插件
 
@@ -148,7 +148,7 @@ Hold on！我知道大家已經聽膩這個了，但是作為一個全端工程�
 
 ## 結語
 
-如果你也有拿到 Plugin 的權限，可以考慮跟著我看的這個 [youtube tutorial](<[https://www.youtube.com/watch?v=kHVkAvxkuy8](https://www.youtube.com/watch?v=kHVkAvxkuy8)>) 做一次試試看，自己動手感受真的不一樣。
+如果你也有拿到 Plugin 的權限，可以考慮跟著我看的這個 [youtube tutorial](https://www.youtube.com/watch?v=kHVkAvxkuy8) 做一次試試看，自己動手感受真的不一樣。
 
 AI 的工具真的是每天都在更新，看到都有點膩了，但是每次有新的東西一試還是會嚇一跳。這次應該算是早拿到 Plugin 的權限，有幸玩了一下，體驗了一回。現有上架的插件都還偏陽春，但是就像我前面說的，當更多資源加入，故事就會變得有趣起來，我們可以好好期待一下。相信 Plugin 的應用還有威力應該遠遠大於我現在感受的，如果你有什麼不同的想法歡迎跟我一起討論。
 
