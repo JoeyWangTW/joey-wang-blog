@@ -31,11 +31,29 @@ const projectsData = [
     href: 'https://www.youtube.com/user/TheJoeywang123',
   },
   {
+    title: 'Memory Lane',
+    description: `Dementia Digital Therapeutic System. Using machine learning, and tangible device to provide reminiscence therapy.`,
+    imgSrc: '/static/images/memory_lane.jpeg',
+    href: 'https://youtu.be/Z_sDTR8nKX8',
+  },
+  {
+    title: 'QuarantineBuster',
+    description: `Virtual social & happy hour web application.`,
+    imgSrc: '/static/images/qb.png',
+    href: 'https://quarantinebuster.com/',
+  },
+  {
+    title: 'SnapSort!',
+    description: `AI Waste Sorting Assistant. Using computer vision, embedded device to provide an easy retrofit solution.`,
+    imgSrc: '/static/images/snapsort.png',
+    href: 'https://youtu.be/aTaK2tVGCpw',
+  },
+  /*{
     title: 'Personal Site (Work In Progress)',
     description: `personal website, portfolio. Still work in progress to build more on it.`,
     imgSrc: '/static/images/personal-site.png',
     href: 'https://www.szuyuwang.com',
-  },
+  },*/
 ]
 
 export default projectsData
