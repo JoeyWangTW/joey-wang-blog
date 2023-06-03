@@ -1,5 +1,18 @@
 const projectsData = [
   {
+    title: 'AI Knoledge Map',
+    description: `Automatic Reasearch, brainstorming tool powered by AI. Generate nested knowledge map providing only the topic keyword.`,
+    imgSrc: '/static/images/akm.png',
+    href: 'https://www.aiknowledgemap.com/',
+  },
+  {
+    title: 'ChatGPT Notifier',
+    description: `Chrome extension the plays a notification sound when ChatGPT has finished responding.`,
+    imgSrc: '/static/images/chatgpt_notifier.jpg',
+    href:
+      'https://chrome.google.com/webstore/detail/chatgpt-notifier/kpbihpkcpnfnjddplngmbljcfofjgejh',
+  },
+  {
     title: 'DDDYOR',
     description: `An interactive website to connect wallets on the Ethereum blockchain`,
     imgSrc: '/static/images/dddyor/demo.jpg',
