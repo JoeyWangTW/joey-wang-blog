@@ -131,6 +131,10 @@ Procfile          text
 *.jp2             binary
 *.jpg             binary
 *.jpeg            binary
+# Patterns are case-sensitive; cover uppercase camera extensions too
+*.JPG             binary
+*.JPEG            binary
+*.PNG             binary
 *.jpx             binary
 *.jxr             binary
 *.pdf             binary

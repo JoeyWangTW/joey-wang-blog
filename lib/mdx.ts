@@ -55,13 +55,7 @@ export function dateSortDesc(a: string, b: string) {
   return 0
 }
 
-export async function getFileBySlug<T>(type: 'authors' | 'blog', slug: string | string[]) {
-  const mdxPath = path.join(root, 'data', type, `${slug}.mdx`)
-  const mdPath = path.join(root, 'data', type, `${slug}.md`)
-  const source = fs.existsSync(mdxPath)
-    ? fs.readFileSync(mdxPath, 'utf8')
-    : fs.readFileSync(mdPath, 'utf8')
-
+export async function bundleMarkdown(source: string) {
   // https://github.com/kentcdodds/mdx-bundler#nextjs-esbuild-enoent
   if (process.platform === 'win32') {
     process.env.ESBUILD_BINARY_PATH = path.join(
@@ -125,6 +119,18 @@ export async function getFileBySlug<T>(type: 'authors' | 'blog', slug: string | 
       return options
     },
   })
+
+  return { frontmatter, code, toc }
+}
+
+export async function getFileBySlug<T>(type: 'authors' | 'blog', slug: string | string[]) {
+  const mdxPath = path.join(root, 'data', type, `${slug}.mdx`)
+  const mdPath = path.join(root, 'data', type, `${slug}.md`)
+  const source = fs.existsSync(mdxPath)
+    ? fs.readFileSync(mdxPath, 'utf8')
+    : fs.readFileSync(mdPath, 'utf8')
+
+  const { frontmatter, code, toc } = await bundleMarkdown(source)
 
   return {
     mdxSource: code,
